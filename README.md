@@ -628,4 +628,87 @@ results = check_collocation(
 This code processes the metadata for Sentinel-3 OLCI and Sentinel-2 imagery by extracting and converting the content dates into a standardized datetime format. The ContentDate column, which contains structured date information, is evaluated using eval() to extract the start and end times. The pd.to_datetime() function ensures that these extracted timestamps are properly formatted, and the make_timezone_naive() function is applied to remove any timezone awareness, ensuring consistency in time comparisons.
 
 Once the date conversions are complete, the check_collocation() function is used to identify instances where the Sentinel-2 and Sentinel-3 OLCI data overlap within a defined time window of 10 minutes. This step is crucial for analyzing co-located satellite observations, ensuring that datasets from both satellites are temporally aligned for further geospatial analysis. The resulting results DataFrame contains matched records where both Sentinel-2 and Sentinel-3 observations occurred within the specified timeframe, allowing for effective data fusion and comparison.
+```python
+from IPython.display import display
 
+display(results.head(5))
+```
+![image](https://github.com/user-attachments/assets/f136ac9d-181f-42e3-9079-af0e87e2fdbf)
+The table displays the first five rows of the collocated dataset, showing matched Sentinel-2 and Sentinel-3 OLCI observations. Each row contains details about the two satellites, including their unique IDs, footprints (geographical coverage), and the time range during which their observations overlap within a 10-minute window. This output helps verify the successful identification of collocated satellite data for further analysis.
+
+```python
+from IPython.display import display
+
+map_result = plot_results(results.head(5))
+display(map_result)
+```
+
+
+This code generates and displays an interactive map visualization of the first five collocated satellite observations. The plot_results function takes the top five rows from the results DataFrame, which contains information about overlapping Sentinel-2 and Sentinel-3 OLCI observations. It then plots the footprints of both satellites on a map using the folium library. The display function from IPython.display ensures that the generated map is rendered within the notebook interface, allowing users to visually inspect the geographic locations where the satellite observations overlap.
+
+![image](https://github.com/user-attachments/assets/e0bb2933-f303-4a27-ace3-e0dab44e97eb)
+This interactive map visualization displays the geographical footprints of the first five collocated satellite observations from Sentinel-2 and Sentinel-3 OLCI. The overlapping satellite data areas are highlighted, showing the regions where both satellites have captured observations within the specified time window.
+
+
+<!-- Proceeding with Sentinel-3 OLCI Download -->
+## Proceeding with Sentinel-3 OLCI Download
+Next, we shift our focus to retrieving Sentinel-3 OLCI data. This process follows the same structured approach used for Sentinel-2, ensuring consistency in methodology. By applying the same filename conversion logic, we systematically access and download the required datasets from the Copernicus Dataspace. This step ensures seamless integration of Sentinel-3 OLCI data into our analysis pipeline.
+
+```python
+download_dir = ""  # Replace with your desired download directory
+product_id = results['Satellite1_ID'][0] # Replace with your desired file id
+file_name = results['Satellite1_Name'][0]# Replace with your desired filename
+# Download the single product
+download_single_product(product_id, file_name, access_token, download_dir)
+```
+This code snippet facilitates the download of a specific Sentinel-3 OLCI product from the Copernicus Dataspace. The download_dir variable is used to specify the target directory where the downloaded file will be saved. The product_id and file_name are extracted from the results dataframe, selecting the first product entry for download. The download_single_product function is then called with these parameters, along with an access_token for authentication. This ensures secure and structured retrieval of the satellite data, storing it in the designated directory for further analysis. Users can modify the product_id, file_name, and download_dir to customize their download preferences.
+
+## Sentinel-3 SRAL
+In addition to co-locating Sentinel-2 and Sentinel-3 OLCI data, we can also integrate Sentinel-3 SRAL altimetry data. The overall approach remains the same, requiring only the retrieval of the S3 SRAL metadata. By incorporating SRAL data, we enhance our dataset with valuable altimetry measurements, enabling a more comprehensive analysis of surface characteristics.
+
+```python
+sentinel3_sral_data = query_sentinel3_sral_arctic_data(
+    start_date, end_date, access_token
+)
+
+sentinel3_sral_data.to_csv(
+    path_to_save_data + "s3_sral_metadata.csv",
+    index=False,
+)
+```
+This code retrieves Sentinel-3 SRAL (Synthetic Aperture Radar Altimeter) metadata for a specified time range and saves it as a CSV file. The query_sentinel3_sral_arctic_data function is used to fetch the SRAL data from the Copernicus Data Space, using the defined start_date, end_date, and access_token for authentication. Once the metadata is retrieved, it is stored in the variable sentinel3_sral_data. The second part of the code converts this dataset into a CSV file named "s3_sral_metadata.csv", which is saved in the specified directory defined by path_to_save_data. This ensures that the retrieved SRAL metadata is easily accessible for further processing or analysis.
+
+And now you do the co-locaton again for S3 SRAL with S2 for example:
+```python
+s3_sral_metadata = pd.read_csv(
+    path_to_save_data + "s3_sral_metadata.csv"
+)
+s2_metadata = pd.read_csv(
+    path_to_save_data + "sentinel2_metadata.csv"
+)
+```
+This code loads previously saved metadata files for Sentinel-3 SRAL and Sentinel-2 satellite data into Pandas DataFrames for further analysis. The pd.read_csv function reads the "s3_sral_metadata.csv" file, which contains metadata for Sentinel-3 SRAL data, and stores it in the variable s3_sral_metadata. Similarly, the "sentinel2_metadata.csv" file, which holds metadata for Sentinel-2 data, is read and stored in the variable s2_metadata. These datasets will be used in subsequent processing steps, such as identifying co-locations between the two datasets for comparative or combined analysis.
+
+
+```python
+s3_sral_metadata["ContentDate.Start"] = pd.to_datetime(
+    s3_sral_metadata["ContentDate"].apply(lambda x: eval(x)["Start"])
+).apply(make_timezone_naive)
+s3_sral_metadata["ContentDate.End"] = pd.to_datetime(
+    s3_sral_metadata["ContentDate"].apply(lambda x: eval(x)["End"])
+).apply(make_timezone_naive)
+
+s2_metadata["ContentDate.Start"] = pd.to_datetime(
+    s2_metadata["ContentDate"].apply(lambda x: eval(x)["Start"])
+).apply(make_timezone_naive)
+s2_metadata["ContentDate.End"] = pd.to_datetime(
+    s2_metadata["ContentDate"].apply(lambda x: eval(x)["End"])
+).apply(make_timezone_naive)
+
+results = check_collocation(
+    s2_metadata, s3_sral_metadata, start_date, end_date,time_window=pd.to_timedelta("10 minutes")
+)
+```
+This code processes the metadata for Sentinel-3 SRAL and Sentinel-2 datasets by extracting and converting their content date fields into a standardized datetime format for accurate time-based analysis. It begins by applying the eval function to parse the "ContentDate" column in both datasets, extracting the "Start" and "End" timestamps. The extracted values are then converted into timezone-naive datetime objects using pd.to_datetime, followed by the make_timezone_naive function to ensure consistency in time representation.
+
+Once the timestamps are properly formatted, the code performs a collocation check between Sentinel-2 and Sentinel-3 SRAL datasets. The check_collocation function is used to determine overlapping observations based on spatial and temporal criteria. The time_window=pd.to_timedelta("10 minutes") argument ensures that only those data points that fall within a 10-minute time difference are considered collocated. The output is stored in the results variable, which contains details of matching observations between Sentinel-2 and Sentinel-3 SRAL data.
