@@ -787,22 +787,53 @@ K-means follows an iterative approach where the assignment and update steps repe
 
 2-Ease of Interpretation: The clustering results are straightforward, making it easy to analyze and understand the underlying data patterns.
 
+### Basic Code Implementation
+Below is a fundamental implementation of the K-means clustering algorithm. This example provides a solid starting point for understanding how the algorithm works and can be adapted for various data analysis tasks. By exploring this implementation, you can gain insights into clustering techniques and apply them effectively to real-world datasets.
+
+```python
+from google.colab import drive
+drive.mount('/content/drive')
+```
+
+This code is used in Google Colab to mount Google Drive, allowing users to access files stored in their Drive directly from the Colab notebook. The from google.colab import drive statement imports the drive module from the google.colab package, which is specifically designed for working with Google Colab. The drive.mount('/content/drive') command then mounts the user’s Google Drive to the /content/drive directory, enabling seamless reading and writing of files. Once executed, users will be prompted to authenticate their Google account and grant necessary permissions. This is particularly useful for loading datasets, saving outputs, and managing files within Colab.
+
+```python
+pip install rasterio
+```
+The command pip install rasterio is used to install the Rasterio library, a powerful tool for reading, writing, and processing geospatial raster data. Rasterio provides a Pythonic interface to interact with raster datasets, such as satellite imagery and digital elevation models, using the GDAL (Geospatial Data Abstraction Library) backend. By running this command, users can install Rasterio and its dependencies, enabling them to work with raster data efficiently, perform geospatial analysis, and manipulate multi-band imagery in Python. This command is typically executed in a Jupyter Notebook, Google Colab, or a terminal to ensure that the library is available for use in geospatial projects.
+
+```python
+pip install netCDF4
+```
+The command pip install netCDF4 is used to install the netCDF4 library, which provides tools for reading, writing, and manipulating netCDF (Network Common Data Form) files. NetCDF is a widely used data format for storing large-scale scientific data, particularly in meteorology, oceanography, and climate research. This library enables users to efficiently handle multi-dimensional data arrays, access metadata, and perform various operations on netCDF files in Python. Running this command ensures that the necessary dependencies are installed, allowing seamless interaction with netCDF datasets in Jupyter Notebooks, Google Colab, or Python scripts.
 
 
+```python
+# Python code for K-means clustering
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+import numpy as np
 
+# Sample data
+X = np.random.rand(100, 2)
 
+# K-means model
+kmeans = KMeans(n_clusters=4)
+kmeans.fit(X)
+y_kmeans = kmeans.predict(X)
 
+# Plotting
+plt.scatter(X[:, 0], X[:, 1], c=y_kmeans, cmap='viridis')
+centers = kmeans.cluster_centers_
+plt.scatter(centers[:, 0], centers[:, 1], c='black', s=200, alpha=0.5)
+plt.show()
+```
+This Python script implements a basic K-means clustering algorithm using the scikit-learn library. It begins by importing necessary libraries, including KMeans for clustering, matplotlib.pyplot for visualization, and numpy for numerical operations. The script generates a sample dataset consisting of 100 random points in a two-dimensional space. A K-means model is then initialized with four clusters (n_clusters=4) and trained on this dataset using kmeans.fit(X). After training, the model predicts the cluster assignments for each data point, storing the results in y_kmeans. To visualize the clustering results, a scatter plot is created where each point is color-coded according to its assigned cluster. Additionally, the computed centroids of the clusters are extracted using kmeans.cluster_centers_ and displayed as black dots to indicate the center of each group. Finally, the plt.show() function renders the plot, providing a clear visualization of how the algorithm has grouped the data into distinct clusters. This implementation serves as a foundational example for understanding how K-means clustering can be applied to pattern recognition and data segmentation tasks.
 
+![image](https://github.com/user-attachments/assets/e336776c-92d6-4d6a-b3fc-be0c1f41960d)
+Visualization of K-means clustering results on a randomly generated dataset. The colored points represent individual data samples grouped into four clusters, while the black dots indicate the centroids of each cluster, calculated by the K-means algorithm.
 
-
-
-
-
-
-
-
-
-
-
+<!-- Unsupervised Learning -->
+## Unsupervised Learning
 
 
