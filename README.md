@@ -833,7 +833,572 @@ This Python script implements a basic K-means clustering algorithm using the sci
 ![image](https://github.com/user-attachments/assets/e336776c-92d6-4d6a-b3fc-be0c1f41960d)
 Visualization of K-means clustering results on a randomly generated dataset. The colored points represent individual data samples grouped into four clusters, while the black dots indicate the centroids of each cluster, calculated by the K-means algorithm.
 
-<!-- Unsupervised Learning -->
-## Unsupervised Learning
+<!-- Gaussian Mixture Models (GMM) [Bishop and Nasrabadi, 2006] -->
+## Gaussian Mixture Models (GMM) [Bishop and Nasrabadi, 2006]
+### Introduction to Gaussian Mixture Models
+Gaussian Mixture Models (GMM) are a powerful probabilistic approach for modeling normally distributed subpopulations within a larger dataset. This technique assumes that data is generated from a combination of multiple Gaussian distributions, each characterized by its unique mean and variance [Reynolds and others, 2009]. GMMs are widely employed in clustering and density estimation, offering a structured way to represent intricate data distributions by merging simpler components.
+
+### Why Gaussian Mixture Models for Clustering?
+Gaussian Mixture Models are particularly advantageous in clustering applications where:
+
+1-Soft Clustering Capabilities: Unlike K-means, which assigns each data point to a single cluster, GMM provides a probabilistic classification. This means each data point has a probability of belonging to multiple clusters, enabling a more nuanced and flexible clustering approach while accounting for uncertainty.
+
+2-Adaptive Cluster Shapes: Unlike K-means, which assumes clusters are spherical, GMM accommodates clusters of varying shapes and sizes. By adjusting the covariance structure of each Gaussian component, GMM provides a more adaptable and precise clustering solution for complex datasets.
+
+These features make GMM a robust choice for clustering scenarios where data exhibits overlapping distributions or varying density regions.
+
+### Key Components of GMM
+1-Defining the Number of Components (Gaussians):
+Similar to specifying the number of clusters in K-means, GMM requires determining the number of Gaussian components. This defines how many distinct distributions will be used to model the data.
+
+2-Expectation-Maximization (EM) Algorithm:
+GMM utilizes the EM algorithm to iteratively refine the model. It alternates between estimating the probability of each data point belonging to a Gaussian and updating the parameters (mean, variance, and weight) to maximize the model’s likelihood.
+
+3-Covariance Structure:
+The shape and orientation of clusters are influenced by the covariance type of the Gaussians. This allows for flexibility, supporting spherical, diagonal, tied, or fully adaptable cluster shapes.
+
+
+
+### The EM Algorithm in GMM
+The EM algorithm follows an iterative two-step process to optimize clustering:
+
+1-Expectation Step (E-step):
+Assigns probabilities to each data point, estimating the likelihood that it belongs to a particular Gaussian component.
+
+2-Maximization Step (M-step):
+Updates the Gaussian parameters (mean, variance, and weight) to maximize the overall likelihood of the dataset given the current assignments.
+
+This process repeats until convergence, meaning the parameters stabilize and the model achieves an optimal fit.
+
+
+### Advantages of GMM
+1-Probabilistic Soft Clustering:
+Unlike hard clustering methods like K-means, GMM provides a probability score for each data point’s cluster membership. This helps in capturing uncertainty and overlapping group structures.
+
+2-Flexible Cluster Shapes:
+GMM supports non-spherical cluster formations, making it well-suited for datasets where clusters have varying sizes, orientations, or densities.
+
+By leveraging GMM’s adaptability and probabilistic framework, it becomes an excellent choice for clustering complex datasets with overlapping distributions.
+
+### Basic Code Implementation
+Below is a fundamental implementation of the Gaussian Mixture Model (GMM). This example provides a foundational understanding of how GMM works and serves as a practical starting point for incorporating it into data analysis tasks.
+
+
+```python
+from sklearn.mixture import GaussianMixture
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Sample data
+X = np.random.rand(100, 2)
+
+# GMM model
+gmm = GaussianMixture(n_components=3)
+gmm.fit(X)
+y_gmm = gmm.predict(X)
+
+# Plotting
+plt.scatter(X[:, 0], X[:, 1], c=y_gmm, cmap='viridis')
+centers = gmm.means_
+plt.scatter(centers[:, 0], centers[:, 1], c='black', s=200, alpha=0.5)
+plt.title('Gaussian Mixture Model')
+plt.show()
+```
+This code demonstrates the implementation of the Gaussian Mixture Model (GMM) for clustering a set of randomly generated data points. It begins by importing necessary libraries: GaussianMixture from sklearn.mixture for clustering, matplotlib.pyplot for visualization, and numpy for numerical operations. The dataset consists of 100 randomly generated points in a two-dimensional space. A GMM model is then initialized with three components (clusters) and fitted to the dataset. The model predicts cluster assignments for each data point. To visualize the results, the data points are plotted using different colors to represent different clusters, and the computed cluster centers (means) are highlighted in black. This visualization helps illustrate how GMM effectively groups similar data points based on probabilistic distributions.
+
+![image](https://github.com/user-attachments/assets/ba6c9c55-ed2b-43ef-82a8-543445e64478)
+Visualization of clustering results using the Gaussian Mixture Model (GMM). The data points are grouped into three distinct clusters, each represented by a different color. The black points indicate the computed cluster centers (means), highlighting the probabilistic nature of GMM clustering.
+
+## Image Classification
+In this section, we delve into the application of unsupervised learning techniques for image classification. Our primary focus is distinguishing between sea ice and leads using Sentinel-2 imagery. By leveraging clustering algorithms, we can identify and classify patterns in the imagery without the need for labeled data, enhancing our ability to analyze and interpret remote sensing data efficiently.
+
+### K-Means Implementation
+```python
+import rasterio
+import numpy as np
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+base_path = "/content/drive/MyDrive/GEOL0069/2425/Week 4/Unsupervised Learning/S2A_MSIL1C_20190301T235611_N0207_R116_T01WCU_20190302T014622.SAFE/GRANULE/L1C_T01WCU_A019275_20190301T235610/IMG_DATA/" # You need to specify the path
+bands_paths = {
+    'B4': base_path + 'T01WCU_20190301T235611_B04.jp2',
+    'B3': base_path + 'T01WCU_20190301T235611_B03.jp2',
+    'B2': base_path + 'T01WCU_20190301T235611_B02.jp2'
+}
+
+# Read and stack the band images
+band_data = []
+for band in ['B4']:
+    with rasterio.open(bands_paths[band]) as src:
+        band_data.append(src.read(1))
+
+# Stack bands and create a mask for valid data (non-zero values in all bands)
+band_stack = np.dstack(band_data)
+valid_data_mask = np.all(band_stack > 0, axis=2)
+
+# Reshape for K-means, only including valid data
+X = band_stack[valid_data_mask].reshape((-1, 1))
+
+# K-means clustering
+kmeans = KMeans(n_clusters=2, random_state=0).fit(X)
+labels = kmeans.labels_
+
+# Create an empty array for the result, filled with a no-data value (e.g., -1)
+labels_image = np.full(band_stack.shape[:2], -1, dtype=int)
+
+# Place cluster labels in the locations corresponding to valid data
+labels_image[valid_data_mask] = labels
+
+# Plotting the result
+plt.imshow(labels_image, cmap='viridis')
+plt.title('K-means clustering on Sentinel-2 Bands')
+plt.colorbar(label='Cluster Label')
+plt.show()
+
+del kmeans, labels, band_data, band_stack, valid_data_mask, X, labels_image
+```
+This Python script performs K-means clustering on a Sentinel-2 satellite image to classify surface features based on reflectance values from the red (B4) band. It begins by importing necessary libraries: rasterio for handling satellite imagery, numpy for numerical operations, sklearn.cluster.KMeans for clustering, and matplotlib.pyplot for visualization. The script specifies the file paths for the Sentinel-2 image stored in a designated directory and loads Band 4 (Red) using rasterio.open(), storing the pixel values in a NumPy array. To ensure meaningful processing, a valid data mask is created to filter out pixels with no-data values (zero pixels).
+
+Once the image data is loaded, the script reshapes the band values into a 1D array while excluding invalid pixels. The K-means clustering algorithm is then applied with two clusters (n_clusters=2), aiming to distinguish different surface types, such as sea ice and open water. After fitting the model, the script assigns each pixel a cluster label, classifying the satellite image into distinct regions based on reflectance characteristics.
+
+To reconstruct and visualize the results, the classified pixel labels are reshaped back into the original image dimensions. Any masked-out pixels are assigned a no-data value (-1) to preserve data integrity. The clustering results are displayed using plt.imshow(), where different clusters are represented in distinct colors, allowing for an intuitive visual analysis. Finally, the script clears memory by deleting unnecessary variables to optimize performance.
+
+This approach enables an unsupervised classification of Sentinel-2 imagery, allowing researchers to analyze environmental features without requiring labeled training data. The generated classification map provides valuable insights into surface variations, making it a useful tool for climate monitoring, environmental research, and land cover classification.
+
+![image](https://github.com/user-attachments/assets/4dbda879-080b-406b-b1f0-24b97a1d7aa8)
+This image represents the result of K-means clustering applied to a Sentinel-2 optical band (B4). The clustering algorithm groups pixels into two distinct clusters, as shown by the different colors. The yellow regions likely correspond to sea ice or land, while the darker regions represent open water or other surface types. The color bar on the right indicates cluster labels, with a no-data value (-1) assigned to areas outside the valid data range. This classification helps in distinguishing different surface features in remote sensing imagery.
+
+### GMM Implementation
+
+
+```python
+import rasterio
+import numpy as np
+from sklearn.mixture import GaussianMixture
+import matplotlib.pyplot as plt
+
+# Paths to the band images
+base_path = "/content/drive/MyDrive/GEOL0069/2425/Week 4/Unsupervised Learning/S2A_MSIL1C_20190301T235611_N0207_R116_T01WCU_20190302T014622.SAFE/GRANULE/L1C_T01WCU_A019275_20190301T235610/IMG_DATA/" # You need to specify the path
+bands_paths = {
+    'B4': base_path + 'T01WCU_20190301T235611_B04.jp2',
+    'B3': base_path + 'T01WCU_20190301T235611_B03.jp2',
+    'B2': base_path + 'T01WCU_20190301T235611_B02.jp2'
+}
+
+# Read and stack the band images
+band_data = []
+for band in ['B4']:
+    with rasterio.open(bands_paths[band]) as src:
+        band_data.append(src.read(1))
+
+# Stack bands and create a mask for valid data (non-zero values in all bands)
+band_stack = np.dstack(band_data)
+valid_data_mask = np.all(band_stack > 0, axis=2)
+
+# Reshape for GMM, only including valid data
+X = band_stack[valid_data_mask].reshape((-1, 1))
+
+# GMM clustering
+gmm = GaussianMixture(n_components=2, random_state=0).fit(X)
+labels = gmm.predict(X)
+
+# Create an empty array for the result, filled with a no-data value (e.g., -1)
+labels_image = np.full(band_stack.shape[:2], -1, dtype=int)
+
+# Place GMM labels in the locations corresponding to valid data
+labels_image[valid_data_mask] = labels
+
+# Plotting the result
+plt.imshow(labels_image, cmap='viridis')
+plt.title('GMM clustering on Sentinel-2 Bands')
+plt.colorbar(label='Cluster Label')
+plt.show()
+```
+This Python script performs Gaussian Mixture Model (GMM) clustering on a Sentinel-2 optical band (B4) image using the scikit-learn library. The code begins by defining the file paths for Sentinel-2 bands (B4, B3, and B2), with a specific base directory where the data is stored. It then reads the B4 band using the Rasterio library and stacks the data into a NumPy array. To ensure that only valid pixels are processed, a mask is created to exclude pixels with zero values.
+
+Next, the script reshapes the valid band data into a format suitable for clustering and applies a Gaussian Mixture Model (GMM) with two components. GMM is a probabilistic clustering approach that models data as a mixture of multiple Gaussian distributions, allowing for soft clustering, meaning each pixel is assigned a probability of belonging to each cluster.
+
+Once the model is trained, it assigns cluster labels to the valid pixels. The results are stored in a new array, with invalid areas being assigned a no-data value (-1). Finally, the script visualizes the clustering results using Matplotlib, where different clusters are color-coded, and a color bar is added to indicate cluster labels. This method is useful for analyzing sea ice, land cover, or other environmental patterns in Sentinel-2 imagery.
+
+![2e7a5d5ebb2325493b5e9bdfa718c6d](https://github.com/user-attachments/assets/d6655404-0987-4593-8fc0-2bcc32270091)
+
+Visualization of Gaussian Mixture Model (GMM) clustering applied to Sentinel-2 Band 4 imagery. The image showcases different clusters identified in the dataset, with the color scale representing distinct cluster labels. This method helps differentiate between various land cover types, such as sea ice, open water, and land surfaces, based on spectral reflectance patterns.
+
+
+## Altimetry Classification
+In this section, we explore the application of unsupervised learning techniques for classifying altimetry data, specifically focusing on distinguishing sea ice and leads within the Sentinel-3 altimetry dataset. This approach enables us to analyze surface features based on satellite-derived elevation measurements, improving our understanding of ice dynamics and oceanographic processes.
+
+### Read in Functions Needed
+Before proceeding with modeling, it is essential to preprocess the data to ensure compatibility with analytical methods. This involves converting raw altimetry measurements into meaningful variables, such as peakiness and stack standard deviation (SSD), which provide insights into surface roughness and classification potential. Effective preprocessing enhances model accuracy and ensures a robust classification process.
+
+
+
+
+```python
+#
+from netCDF4 import Dataset
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import griddata
+import numpy.ma as ma
+import glob
+from matplotlib.patches import Polygon
+import scipy.spatial as spatial
+from scipy.spatial import KDTree
+from sklearn.cluster import KMeans, DBSCAN
+from sklearn.preprocessing import StandardScaler,MinMaxScaler
+from sklearn.mixture import GaussianMixture
+from scipy.cluster.hierarchy import linkage, fcluster
+
+#=========================================================================================================
+#===================================  SUBFUNCTIONS  ======================================================
+#=========================================================================================================
+
+#*args and **kwargs allow you to pass an unspecified number of arguments to a function,
+#so when writing the function definition, you do not need to know how many arguments will be passed to your function
+#**kwargs allows you to pass keyworded variable length of arguments to a function.
+#You should use **kwargs if you want to handle named arguments in a function.
+#double star allows us to pass through keyword arguments (and any number of them).
+def peakiness(waves, **kwargs):
+
+    "finds peakiness of waveforms."
+
+    #print("Beginning peakiness")
+    # Kwargs are:
+    #          wf_plots. specify a number n: wf_plots=n, to show the first n waveform plots. \
+
+    import numpy as np
+    import matplotlib
+    import matplotlib.pyplot as plt
+    import time
+
+    print("Running peakiness function...")
+
+    size=np.shape(waves)[0] #.shape property is a tuple of length .ndim containing the length of each dimensions
+                            #Tuple of array dimensions.
+
+    waves1=np.copy(waves)
+
+    if waves1.ndim == 1: #number of array dimensions
+        print('only one waveform in file')
+        waves2=waves1.reshape(1,np.size(waves1)) #numpy.reshape(a, newshape, order='C'), a=array to be reshaped
+        waves1=waves2
+
+    # *args is used to send a non-keyworded variable length argument list to the function
+    def by_row(waves, *args):
+        "calculate peakiness for each waveform"
+        maximum=np.nanmax(waves)
+        if maximum > 0:
+
+            maximum_bin=np.where(waves==maximum)
+            #print(maximum_bin)
+            maximum_bin=maximum_bin[0][0]
+            waves_128=waves[maximum_bin-50:maximum_bin+78]
+
+            waves=waves_128
+
+            noise_floor=np.nanmean(waves[10:20])
+            where_above_nf=np.where(waves > noise_floor)
+
+            if np.shape(where_above_nf)[1] > 0:
+                maximum=np.nanmax(waves[where_above_nf])
+                total=np.sum(waves[where_above_nf])
+                mean=np.nanmean(waves[where_above_nf])
+                peaky=maximum/mean
+
+            else:
+                peaky = np.nan
+                maximum = np.nan
+                total = np.nan
+
+        else:
+            peaky = np.nan
+            maximum = np.nan
+            total = np.nan
+
+        if 'maxs' in args:
+            return maximum
+        if 'totals' in args:
+            return total
+        if 'peaky' in args:
+            return peaky
+
+    peaky=np.apply_along_axis(by_row, 1, waves1, 'peaky') #numpy.apply_along_axis(func1d, axis, arr, *args, **kwargs)
+
+    if 'wf_plots' in kwargs:
+        maximums=np.apply_along_axis(by_row, 1, waves1, 'maxs')
+        totals=np.apply_along_axis(by_row, 1, waves1, 'totals')
+
+        for i in range(0,kwargs['wf_plots']):
+            if i == 0:
+                print("Plotting first "+str(kwargs['wf_plots'])+" waveforms")
+
+            plt.plot(waves1[i,:])#, a, col[i],label=label[i])
+            plt.axhline(maximums[i], color='green')
+            plt.axvline(10, color='r')
+            plt.axvline(19, color='r')
+            plt.xlabel('Bin (of 256)')
+            plt.ylabel('Power')
+            plt.text(5,maximums[i],"maximum="+str(maximums[i]))
+            plt.text(5,maximums[i]-2500,"total="+str(totals[i]))
+            plt.text(5,maximums[i]-5000,"peakiness="+str(peaky[i]))
+            plt.title('waveform '+str(i)+' of '+str(size)+'\n. Noise floor average taken between red lines.')
+            plt.show()
+
+
+    return peaky
+
+#=========================================================================================================
+#=========================================================================================================
+#=========================================================================================================
+
+
+def unpack_gpod(variable):
+
+    from scipy.interpolate import interp1d
+
+    time_1hz=SAR_data.variables['time_01'][:]
+    time_20hz=SAR_data.variables['time_20_ku'][:]
+    time_20hzC = SAR_data.variables['time_20_c'][:]
+
+    out=(SAR_data.variables[variable][:]).astype(float)  # convert from integer array to float.
+
+    #if ma.is_masked(dataset.variables[variable][:]) == True:
+    #print(variable,'is masked. Removing mask and replacing masked values with nan')
+    out=np.ma.filled(out, np.nan)
+
+    if len(out)==len(time_1hz):
+
+        print(variable,'is 1hz. Expanding to 20hz...')
+        out = interp1d(time_1hz,out,fill_value="extrapolate")(time_20hz)
+
+    if len(out)==len(time_20hzC):
+        print(variable, 'is c band, expanding to 20hz ku band dimension')
+        out = interp1d(time_20hzC,out,fill_value="extrapolate")(time_20hz)
+    return out
+
+
+#=========================================================================================================
+#=========================================================================================================
+#=========================================================================================================
+
+def calculate_SSD(RIP):
+
+    from scipy.optimize import curve_fit
+    # from scipy import asarray as ar,exp
+    from numpy import asarray as ar, exp
+
+    do_plot='Off'
+
+    def gaussian(x,a,x0,sigma):
+            return a * np.exp(-(x - x0)**2 / (2 * sigma**2))
+
+    SSD=np.zeros(np.shape(RIP)[0])*np.nan
+    x=np.arange(np.shape(RIP)[1])
+
+    for i in range(np.shape(RIP)[0]):
+
+        y=np.copy(RIP[i])
+        y[(np.isnan(y)==True)]=0
+
+        if 'popt' in locals():
+            del(popt,pcov)
+
+        SSD_calc=0.5*(np.sum(y**2)*np.sum(y**2)/np.sum(y**4))
+        #print('SSD calculated from equation',SSD)
+
+        #n = len(x)
+        mean_est = sum(x * y) / sum(y)
+        sigma_est = np.sqrt(sum(y * (x - mean_est)**2) / sum(y))
+        #print('est. mean',mean,'est. sigma',sigma_est)
+
+        try:
+            popt,pcov = curve_fit(gaussian, x, y, p0=[max(y), mean_est, sigma_est],maxfev=10000)
+        except RuntimeError as e:
+            print("Gaussian SSD curve-fit error: "+str(e))
+            #plt.plot(y)
+            #plt.show()
+
+        except TypeError as t:
+            print("Gaussian SSD curve-fit error: "+str(t))
+
+        if do_plot=='ON':
+
+            plt.plot(x,y)
+            plt.plot(x,gaussian(x,*popt),'ro:',label='fit')
+            plt.axvline(popt[1])
+            plt.axvspan(popt[1]-popt[2], popt[1]+popt[2], alpha=0.15, color='Navy')
+            plt.show()
+
+            print('popt',popt)
+            print('curve fit SSD',popt[2])
+
+        if 'popt' in locals():
+            SSD[i]=abs(popt[2])
+
+
+    return SSD
+```
+This Python script is designed for processing Sentinel-3 SAR altimetry data, specifically focusing on extracting and analyzing waveform characteristics such as peakiness and stack standard deviation (SSD). The code utilizes scientific and machine learning libraries, including NumPy, SciPy, Matplotlib, and Scikit-learn, to preprocess, analyze, and classify satellite altimetry data. The script begins by importing the necessary libraries for handling NetCDF data, performing mathematical operations, and implementing clustering techniques such as K-Means, DBSCAN, and Gaussian Mixture Models (GMMs).
+
+One of the key functions, peakiness, calculates the peakiness of waveforms, which is a crucial metric for determining the sharpness of the altimeter return signal. This function identifies the maximum peak in the waveform, computes the peak-to-mean power ratio, and provides an option to visualize waveforms with annotated peak values. The script also includes the unpack_gpod function, which extracts altimetry variables from SAR data while handling masked values and converting low-resolution (1Hz) data to high-resolution (20Hz) timestamps using interpolation. This ensures consistency in data representation.
+
+Another critical function, calculate_SSD, determines the Stack Standard Deviation (SSD), which measures variability in waveform returns. It applies Gaussian curve fitting to estimate signal spread, helping in the classification of surface types such as ice, water, and land. This function can also generate visualizations of SSD calculations, providing insights into signal characteristics.
+
+Overall, this script is highly useful for scientific research and remote sensing applications, enabling the classification of sea ice, leads, and open ocean surfaces using waveform-derived features. Additionally, the inclusion of machine learning clustering techniques (K-Means, DBSCAN, GMMs) enhances data segmentation, making it possible to detect and categorize patterns in Sentinel-3 altimetry data efficiently.
+
+
+```python
+path = '/content/drive/MyDrive/GEOL0069/2425/Week 4/Unsupervised Learning/'
+SAR_file = 'S3A_SR_2_LAN_SI_20190307T005808_20190307T012503_20230527T225016_1614_042_131______LN3_R_NT_005.SEN3'
+SAR_data = Dataset(path + SAR_file + '/enhanced_measurement.nc')
+
+SAR_lat = unpack_gpod('lat_20_ku')
+SAR_lon = unpack_gpod('lon_20_ku')
+waves   = unpack_gpod('waveform_20_ku')
+sig_0   = unpack_gpod('sig0_water_20_ku')
+RIP     = unpack_gpod('rip_20_ku')
+flag = unpack_gpod('surf_type_class_20_ku')
+
+# Filter out bad data points using criteria (here, lat >= -99999)
+find = np.where(SAR_lat >= -99999)
+SAR_lat = SAR_lat[find]
+SAR_lon = SAR_lon[find]
+waves   = waves[find]
+sig_0   = sig_0[find]
+RIP     = RIP[find]
+
+# Calculate additional features
+PP = peakiness(waves)
+SSD = calculate_SSD(RIP)
+
+# Convert to numpy arrays (if not already)
+sig_0_np = np.array(sig_0)
+PP_np    = np.array(PP)
+SSD_np   = np.array(SSD)
+
+# Create data matrix
+data = np.column_stack((sig_0_np, PP_np, SSD_np))
+
+# Standardize the data
+scaler = StandardScaler()
+data_normalized = scaler.fit_transform(data)
+```
+
+
+
+
+
+This Python script is designed to process and analyze Sentinel-3 SAR altimetry data, specifically using the SRAL (Synthetic Aperture Radar Altimeter) measurements. The script begins by defining the file path and loading the NetCDF dataset containing enhanced measurement data. It then extracts key parameters, including latitude (SAR_lat), longitude (SAR_lon), waveform data (waves), backscatter coefficient (sig_0), radar impulse response (RIP), and surface classification flags using the unpack_gpod function. These variables are crucial for understanding the surface characteristics of ocean, ice, and land regions.
+
+To ensure data quality, the script applies a filtering step where only valid latitudes (≥ -99999) are retained, ensuring that invalid or missing data points are excluded from further analysis. Once the clean dataset is obtained, the script computes two essential waveform-derived features: Peakiness (PP) and Stack Standard Deviation (SSD). Peakiness (PP) is a measure of waveform sharpness, which helps differentiate between ocean, ice, and leads, while Stack Standard Deviation (SSD) quantifies variability in return signals, providing additional insights into surface roughness.
+
+The extracted waveform parameters (sig_0, PP, and SSD) are then combined into a structured data matrix using np.column_stack(), ensuring that all relevant features are aligned for machine learning applications. To enhance the performance of clustering algorithms, the script applies feature scaling using the StandardScaler from Scikit-learn, which standardizes the data to have zero mean and unit variance. This step is crucial for ensuring that different features contribute equally to clustering models, such as K-Means, Gaussian Mixture Models (GMMs), or DBSCAN.
+
+Overall, this script efficiently prepares and normalizes Sentinel-3 SAR altimetry data for further machine learning-based classification and clustering, enabling the identification of different surface types based on altimetric measurements.
+
+There are some NaN values in the dataset so one way to deal with this is to delete them:
+```python
+# Remove any rows that contain NaN values
+nan_count = np.isnan(data_normalized).sum()
+print(f"Number of NaN values in the array: {nan_count}")
+
+data_cleaned = data_normalized[~np.isnan(data_normalized).any(axis=1)]
+
+mask = ~np.isnan(data_normalized).any(axis=1)
+waves_cleaned = np.array(waves)[mask] 
+flag_cleaned = np.array(flag)[mask]
+
+data_cleaned = data_cleaned[(flag_cleaned==1)|(flag_cleaned==2)]
+waves_cleaned = waves_cleaned[(flag_cleaned==1)|(flag_cleaned==2)]
+flag_cleaned = flag_cleaned[(flag_cleaned==1)|(flag_cleaned==2)]
+```
+
+This script is responsible for data cleaning and preprocessing by handling missing values (NaNs) and filtering data based on predefined conditions.
+
+First, the script counts the number of NaN (Not a Number) values in the data_normalized array using np.isnan(data_normalized).sum(). This step helps identify missing or invalid values, which may arise from incomplete satellite measurements or preprocessing errors. It then removes all rows containing NaN values using data_normalized[~np.isnan(data_normalized).any(axis=1)], ensuring that only complete and valid observations are used in further analysis.
+
+Next, the script applies the same filtering process to related datasets, including waves_cleaned (which stores cleaned waveform data) and flag_cleaned (which contains classification flags). The mask ensures that only non-NaN entries from waves and flag are selected, keeping the datasets aligned.
+
+Finally, the script filters the data based on surface classification flags, specifically keeping only values where flag_cleaned equals 1 or 2. These values typically correspond to specific surface types, such as open ocean, sea ice, or leads, depending on the dataset. This ensures that the dataset remains focused on relevant surface classifications, making it more suitable for unsupervised learning techniques like clustering or classification.
+
+In summary, this script cleans the dataset, removes missing values, and retains only relevant data points based on surface classification flags, thereby improving the quality of input data for subsequent machine learning analyses.
+
+Now, let’s proceed with running the GMM model as usual. Remember, you have the flexibility to substitute this with K-Means or any other preferred model:
+```python
+gmm = GaussianMixture(n_components=2, random_state=0)
+gmm.fit(data_cleaned)
+clusters_gmm = gmm.predict(data_cleaned)
+```
+This script applies Gaussian Mixture Model (GMM) clustering to the cleaned dataset, grouping data points into clusters based on their statistical properties.
+
+First, a GaussianMixture model is initialized with two components (n_components=2), meaning that the algorithm will attempt to classify the data into two distinct clusters. The random_state=0 ensures that the results are reproducible by setting a fixed random seed.
+
+Next, the model is trained using gmm.fit(data_cleaned), which fits the Gaussian Mixture Model to the preprocessed and standardized dataset (data_cleaned). The GMM algorithm assumes that the data is drawn from a mixture of two Gaussian distributions, each with its own mean and covariance. It iteratively refines the model using the Expectation-Maximization (EM) algorithm to estimate the parameters of these distributions.
+
+Finally, the trained model is used to predict cluster assignments for each data point using gmm.predict(data_cleaned), storing the results in clusters_gmm. Each data point is assigned to one of the two Gaussian components, effectively segmenting the dataset into two distinct clusters.
+
+This approach is particularly useful when working with continuous, normally distributed data and allows for soft clustering, meaning each data point has a probability of belonging to each cluster rather than a hard assignment. This makes GMM more flexible than K-means, especially when clusters have different shapes and variances.
+
+We can also inspect how many data points are there in each class of your clustering prediction:
+
+```python
+unique, counts = np.unique(clusters_gmm, return_counts=True)
+class_counts = dict(zip(unique, counts))
+print("Cluster counts:", class_counts)
+```
+
+This script analyzes the distribution of data points across the clusters identified by the Gaussian Mixture Model (GMM).
+
+First, the np.unique() function is used to count the occurrences of each cluster label in clusters_gmm, which stores the cluster assignments for the dataset. The return_counts=True argument ensures that the function returns both the unique cluster labels and their corresponding counts.
+
+Next, the results are combined into a dictionary using dict(zip(unique, counts)), where the cluster labels serve as keys, and their respective counts as values. This structured output is stored in class_counts.
+
+Finally, the script prints the number of data points assigned to each cluster, giving insight into how the Gaussian Mixture Model has distributed the data. If the clusters are significantly imbalanced, this may indicate differences in the density or distribution of features, which could warrant further analysis or tuning of the clustering parameters.
+
+```python
+# mean and standard deviation for all echoes
+mean_ice = np.mean(waves_cleaned[clusters_gmm==0],axis=0)
+std_ice = np.std(waves_cleaned[clusters_gmm==0], axis=0)
+
+plt.plot(mean_ice, label='ice')
+plt.fill_between(range(len(mean_ice)), mean_ice - std_ice, mean_ice + std_ice, alpha=0.3)
+
+
+mean_lead = np.mean(waves_cleaned[clusters_gmm==1],axis=0)
+std_lead = np.std(waves_cleaned[clusters_gmm==1], axis=0)
+
+plt.plot(mean_lead, label='lead')
+plt.fill_between(range(len(mean_lead)), mean_lead - std_lead, mean_lead + std_lead, alpha=0.3)
+
+plt.title('Plot of mean and standard deviation for each class')
+plt.legend()
+```
+This script performs an analysis and visualization of the mean and standard deviation of waveforms for different clusters identified by the Gaussian Mixture Model (GMM), aiming to differentiate between sea ice and leads in the dataset. First, the script calculates the mean and standard deviation for waveforms categorized as sea ice (cluster 0). It extracts the relevant waveforms using waves_cleaned[clusters_gmm==0] and computes their mean and standard deviation using NumPy functions. The mean waveform is then plotted, with a shaded area representing one standard deviation to indicate variability.
+
+Next, the same process is repeated for waveforms categorized as leads (cluster 1), ensuring a comparative analysis between the two classes. The script then plots both the mean waveforms for ice and leads while shading their respective standard deviations for better visualization. A legend is included to clearly differentiate the two categories, and the plot is titled "Plot of mean and standard deviation for each class" to indicate the purpose of the visualization.
+
+This approach allows for an intuitive understanding of waveform differences between sea ice and leads, highlighting variations in their reflectivity patterns based on the statistical properties of the dataset. Such an analysis is crucial for effective classification and interpretation of altimetry data in remote sensing applications.
+
+![7c3651827a7ebef8494864dcce54cc8](https://github.com/user-attachments/assets/88e34ef0-0769-4cbb-9a76-073679057a75)
+
+Visualization of the mean waveforms for sea ice and leads, with shaded areas representing one standard deviation. This plot helps to compare the reflectivity patterns of the two surface types, highlighting differences in waveform characteristics. The blue curve corresponds to sea ice, while the orange curve represents leads, demonstrating variability in their respective waveform signals.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
