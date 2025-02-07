@@ -595,9 +595,37 @@ This code utilizes the display function from the IPython.display module to visua
 ![7a75d1a91255c7e1a9145b45bb2fb72](https://github.com/user-attachments/assets/b428d280-5b6a-4ce4-a588-f9d46936ab1d)
 This table displays metadata retrieved for Sentinel-2 images using the Copernicus Data Space API. It includes details such as product IDs, content type, content length, acquisition dates, publication and modification timestamps, online availability, and storage paths. This dataset is essential for analyzing and identifying relevant Sentinel-2 imagery based on specific timeframes and geospatial locations.
 
+### Co-locate the data
+In this section we use the metadata we have just produced to produce the co-location pair details. The logic of the code is match rows from S2 and S3 OLCI by their geo_footprint.
+```python
+s3_olci_metadata = pd.read_csv(
+    path_to_save_data + "sentinel3_olci_metadata.csv"
+)
+s2_metadata = pd.read_csv(
+    path_to_save_data + "sentinel2_metadata.csv"
+)
+```
+This code snippet loads previously saved metadata for Sentinel-3 OLCI and Sentinel-2 imagery into Pandas DataFrames. The pd.read_csv() function reads the metadata from CSV files stored in the specified directory, allowing for easy access and further analysis. The s3_olci_metadata variable contains details about Sentinel-3 OLCI data, while s2_metadata holds information on Sentinel-2 data. By loading these datasets, we can efficiently process and analyze satellite imagery without needing to re-fetch the data from the API, saving both time and computational resources.
+```python
+s3_olci_metadata["ContentDate.Start"] = pd.to_datetime(
+    s3_olci_metadata["ContentDate"].apply(lambda x: eval(x)["Start"])
+).apply(make_timezone_naive)
+s3_olci_metadata["ContentDate.End"] = pd.to_datetime(
+    s3_olci_metadata["ContentDate"].apply(lambda x: eval(x)["End"])
+).apply(make_timezone_naive)
 
+s2_metadata["ContentDate.Start"] = pd.to_datetime(
+    s2_metadata["ContentDate"].apply(lambda x: eval(x)["Start"])
+).apply(make_timezone_naive)
+s2_metadata["ContentDate.End"] = pd.to_datetime(
+    s2_metadata["ContentDate"].apply(lambda x: eval(x)["End"])
+).apply(make_timezone_naive)
 
+results = check_collocation(
+    s2_metadata, s3_olci_metadata, start_date, end_date,time_window=pd.to_timedelta("10 minutes")
+)
+```
+This code processes the metadata for Sentinel-3 OLCI and Sentinel-2 imagery by extracting and converting the content dates into a standardized datetime format. The ContentDate column, which contains structured date information, is evaluated using eval() to extract the start and end times. The pd.to_datetime() function ensures that these extracted timestamps are properly formatted, and the make_timezone_naive() function is applied to remove any timezone awareness, ensuring consistency in time comparisons.
 
-
-
+Once the date conversions are complete, the check_collocation() function is used to identify instances where the Sentinel-2 and Sentinel-3 OLCI data overlap within a defined time window of 10 minutes. This step is crucial for analyzing co-located satellite observations, ensuring that datasets from both satellites are temporally aligned for further geospatial analysis. The resulting results DataFrame contains matched records where both Sentinel-2 and Sentinel-3 observations occurred within the specified timeframe, allowing for effective data fusion and comparison.
 
