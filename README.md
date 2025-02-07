@@ -571,7 +571,11 @@ s2_metadata.to_csv(
     index=False,
 )
 ```
+This code retrieves and saves metadata for Sentinel-2 and Sentinel-3 OLCI satellite data within a specified date range. It first initializes user credentials (username and password), which are required to obtain an access token and refresh token using the get_access_and_refresh_token() function. The user then defines a start date and end date for the data query, as well as a file path where the retrieved metadata will be saved.
 
+Next, the script calls query_sentinel3_olci_arctic_data() to fetch Sentinel-3 OLCI data and query_sentinel2_arctic_data() to fetch Sentinel-2 optical data for the given time period. For Sentinel-2, an additional filter is applied to select images with cloud coverage between 0% and 10%, ensuring better visibility of the Earth's surface.
+
+Finally, the retrieved metadata is saved as CSV files in the specified directory. The Sentinel-3 OLCI metadata is stored as sentinel3_olci_metadata.csv, while the Sentinel-2 metadata is saved as sentinel2_metadata.csv. These files serve as a structured dataset that can be used for further analysis, such as co-locating observations from both satellites.
 
 
 
