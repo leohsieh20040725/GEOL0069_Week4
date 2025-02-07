@@ -577,8 +577,23 @@ Next, the script calls query_sentinel3_olci_arctic_data() to fetch Sentinel-3 OL
 
 Finally, the retrieved metadata is saved as CSV files in the specified directory. The Sentinel-3 OLCI metadata is stored as sentinel3_olci_metadata.csv, while the Sentinel-2 metadata is saved as sentinel2_metadata.csv. These files serve as a structured dataset that can be used for further analysis, such as co-locating observations from both satellites.
 
+```python
+from IPython.display import display
 
+display(s3_olci_metadata)
+```
+This code is used to display the Sentinel-3 OLCI metadata in a structured table format within a Jupyter Notebook or Google Colab environment. It first imports the display function from the IPython library, which allows for better visualization of data compared to the standard print() function. The display(s3_olci_metadata) command then renders the previously retrieved Sentinel-3 OLCI metadata as a well-formatted table, making it easier to analyze and interpret. This approach is particularly useful when working with large datasets, as it ensures the metadata is displayed in a clear and organized manner rather than raw text output.
+![422d13d80a9193db1c3d56e377ac803](https://github.com/user-attachments/assets/cfcaa103-e028-45e3-bcf9-b91b6957116c)
+The table displays the metadata retrieved for Sentinel-3 OLCI images within the specified time range. It includes essential attributes such as unique product IDs, names, content types, origin dates, modification dates, and storage paths. This metadata is crucial for identifying and accessing relevant satellite data for further analysis and co-location with Sentinel-2.
 
+```python
+from IPython.display import display
+
+display(s2_metadata)
+```
+This code utilizes the display function from the IPython.display module to visually present the s2_metadata DataFrame. The s2_metadata DataFrame contains metadata for Sentinel-2 images retrieved from the Copernicus Data Space within the specified date range. This metadata includes key details such as product IDs, acquisition times, geospatial footprints, and cloud cover percentages. By using display(s2_metadata), the dataset is rendered in a structured tabular format, making it easier to inspect, analyze, and verify the retrieved information directly within an interactive notebook environment.
+![7a75d1a91255c7e1a9145b45bb2fb72](https://github.com/user-attachments/assets/b428d280-5b6a-4ce4-a588-f9d46936ab1d)
+This table displays metadata retrieved for Sentinel-2 images using the Copernicus Data Space API. It includes details such as product IDs, content type, content length, acquisition dates, publication and modification timestamps, online availability, and storage paths. This dataset is essential for analyzing and identifying relevant Sentinel-2 imagery based on specific timeframes and geospatial locations.
 
 
 
