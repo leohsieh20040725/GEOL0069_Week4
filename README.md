@@ -733,9 +733,36 @@ Finally, the generated map is displayed using the display function from IPython.
 This interactive map visualizes the collocation of Sentinel-2 and Sentinel-3 SRAL satellite data. The blue outlines represent the geographical footprints of the detected overlaps, illustrating how the two satellite datasets align over the Arctic region. This visualization helps assess spatial intersections and validate the effectiveness of the collocation process.
 
 
+<!-- Unsupervised Learning -->
+## Unsupervised Learning
+This section introduces a crucial domain in machine learning and AI: unsupervised learning. Rather than diving deep into theoretical complexities, our focus is on providing a hands-on, practical guide. Our goal is to equip you with the knowledge and tools necessary to effectively apply unsupervised learning techniques to real-world Earth Observation (EO) scenarios.
 
+While unsupervised learning has a vast range of applications, this discussion will primarily focus on classification tasks. These techniques are particularly powerful in detecting patterns and grouping data when predefined labels are unavailable. By leveraging these methods, you’ll develop an intuitive understanding of how to uncover hidden structures and relationships within your datasets, even in the absence of explicit categorizations.
 
+In this notebook, we will tackle two key tasks:
 
+1-Distinguishing sea ice from leads using image classification based on Sentinel-2 optical data.
+
+2-Identifying sea ice and leads through altimetry data classification utilizing Sentinel-3 altimetry data.
+
+By the end of this section, you will have a solid foundation in applying unsupervised learning for remote sensing and EO data analysis.
+
+<!-- Introduction to Unsupervised Learning Methods [Bishop and Nasrabadi, 2006] -->
+## Introduction to Unsupervised Learning Methods [Bishop and Nasrabadi, 2006]
+### Introduction to K-means Clustering
+K-means clustering is a widely used unsupervised learning algorithm designed to partition a dataset into k distinct groups (clusters). The parameter k, which represents the number of clusters, is predefined by the user. The algorithm classifies data points based on feature similarity, ensuring that data points within the same cluster are more alike than those in different clusters [MacQueen et al., 1967].
+
+At its core, K-means clustering works by:
+
+1-Defining k centroids, one for each cluster.
+
+2-Assigning each data point to the nearest centroid based on similarity.
+
+3-Updating the centroids by recalculating the cluster means.
+
+4-Iterating this process until the centroids remain stable, minimizing the variation within clusters.
+
+This method is particularly useful for pattern recognition, data segmentation, and exploratory data analysis, making it a fundamental tool in unsupervised learning.
 
 
 
