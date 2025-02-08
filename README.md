@@ -1386,10 +1386,13 @@ Visualization of the mean waveforms for sea ice and leads, with shaded areas rep
 
 
 
-
-
-
-
+```python
+x = np.stack([np.arange(1,waves_cleaned.shape[1]+1)]*waves_cleaned.shape[0])
+plt.plot(x,waves_cleaned)  # plot of all the echos
+plt.show()
+```
+![image](https://github.com/user-attachments/assets/f0985c42-840f-49b7-a879-13fbe593d8e2)
+Visualization of all waveform echoes, showing the distribution and intensity of the signals across different bins. The central peak indicates the dominant signal response, while the spread represents variations in waveform characteristics.
 
 
 
