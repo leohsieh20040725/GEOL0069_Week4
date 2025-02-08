@@ -1503,7 +1503,57 @@ This code snippet performs cross-correlation-based alignment of waveforms within
 
 Caption: Visualization of 10 equally spaced waveforms from the cluster labeled as sea ice (clusters_gmm = 0) after alignment using cross-correlation. This alignment ensures that the peaks of the waveforms are synchronized, allowing for a clearer comparison of waveform structures within the identified cluster.
 
+## Compare with ESA data
+In the ESA dataset, sea ice = 1 and lead = 2. Therefore, we need to subtract 1 from it so our predicted labels are comparable with the official product labels:
 
+```python
+flag_cleaned_modified = flag_cleaned - 1
+```
+
+This line of code, flag_cleaned_modified = flag_cleaned - 1, modifies the flag_cleaned array by subtracting 1 from each of its elements. The purpose of this operation is likely to adjust the labeling of data categories, ensuring that the values start from zero instead of one. This can be useful for compatibility with machine learning models that expect zero-based indexing or for standardizing the dataset before further processing. The modified array, flag_cleaned_modified, retains the same structure as flag_cleaned but with all values shifted down by one.
+
+
+```python
+from sklearn.metrics import confusion_matrix, classification_report
+
+true_labels = flag_cleaned_modified   # true labels from the ESA dataset
+predicted_gmm = clusters_gmm          # predicted labels from GMM method
+
+# Compute confusion matrix
+conf_matrix = confusion_matrix(true_labels, predicted_gmm)
+
+# Print confusion matrix
+print("Confusion Matrix:")
+print(conf_matrix)
+
+# Compute classification report
+class_report = classification_report(true_labels, predicted_gmm)
+
+# Print classification report
+print("\nClassification Report:")
+print(class_report)
+```
+
+This code evaluates the performance of the Gaussian Mixture Model (GMM) clustering method by comparing its predicted labels to the actual labels from the ESA dataset. First, the true labels are extracted from flag_cleaned_modified, while the predicted labels are obtained from the GMM clustering results stored in clusters_gmm. To assess the accuracy of the clustering, the code computes a confusion matrix using confusion_matrix(true_labels, predicted_gmm), which provides a summary of correct and incorrect classifications for each category. The confusion matrix is then printed to analyze the distribution of misclassified data points. Additionally, the code generates a classification report using classification_report(true_labels, predicted_gmm), which calculates key performance metrics such as precision, recall, and F1-score for each class. This report provides a more detailed evaluation of the clustering model's effectiveness in distinguishing between different data categories. By analyzing these outputs, we can determine how well the GMM model aligns with the actual classifications and gain insights into potential improvements.
+
+```python
+Confusion Matrix:
+[[8856   22]
+ [  24 3293]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+         0.0       1.00      1.00      1.00      8878
+         1.0       0.99      0.99      0.99      3317
+
+    accuracy                           1.00     12195
+   macro avg       1.00      1.00      1.00     12195
+weighted avg       1.00      1.00      1.00     12195
+```
+
+
+The confusion matrix and classification report summarize the performance of the Gaussian Mixture Model (GMM) clustering. The confusion matrix shows that 8,856 instances were correctly classified as class 0, while 3,293 instances were correctly classified as class 1. There were 22 misclassified instances of class 0 and 24 misclassified instances of class 1. The classification report indicates a precision, recall, and F1-score close to 1.00, demonstrating high accuracy in distinguishing between the two classes. The overall accuracy is 100%, suggesting that the clustering method effectively separates the data into meaningful groups.
 
 
 
