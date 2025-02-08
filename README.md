@@ -1391,8 +1391,120 @@ x = np.stack([np.arange(1,waves_cleaned.shape[1]+1)]*waves_cleaned.shape[0])
 plt.plot(x,waves_cleaned)  # plot of all the echos
 plt.show()
 ```
+
+This code generates a plot of all waveform echoes in the dataset. It first creates a stacked array x, which represents the bin indices for the waveforms. The waveforms stored in waves_cleaned are then plotted against these bin indices using plt.plot(x, waves_cleaned). This visualization helps in understanding the distribution and variability of waveform signals across different observations. Finally, plt.show() displays the plot, allowing for an overall inspection of the waveform structures.
+
 ![image](https://github.com/user-attachments/assets/f0985c42-840f-49b7-a879-13fbe593d8e2)
+
 Visualization of all waveform echoes, showing the distribution and intensity of the signals across different bins. The central peak indicates the dominant signal response, while the spread represents variations in waveform characteristics.
+
+```python
+# plot echos for the lead cluster
+x = np.stack([np.arange(1,waves_cleaned[clusters_gmm==1].shape[1]+1)]*waves_cleaned[clusters_gmm==1].shape[0])
+plt.plot(x,waves_cleaned[clusters_gmm==1])  # plot of all the echos
+plt.show()
+```
+
+This code generates a plot displaying all waveform echoes that belong to the lead cluster, as identified by the Gaussian Mixture Model (GMM). It first creates an array x representing the bin positions for each waveform. Then, it extracts only the waveforms assigned to the lead class (clusters_gmm==1) and plots them to visualize their distribution. The resulting plot helps analyze the waveform characteristics specific to the lead category.
+
+![image](https://github.com/user-attachments/assets/42acd430-03e3-406f-b61f-d0bbdee17288)
+
+
+Visualization of all waveform echoes classified as lead by the Gaussian Mixture Model (GMM). The plot represents the waveform intensity distribution across different bins, highlighting the distinct characteristics of the lead category in the Sentinel-3 altimetry dataset.
+
+```python
+# plot echos for the sea ice cluster
+x = np.stack([np.arange(1,waves_cleaned[clusters_gmm==0].shape[1]+1)]*waves_cleaned[clusters_gmm==0].shape[0])
+plt.plot(x,waves_cleaned[clusters_gmm==0])  # plot of all the echos
+plt.show()
+```
+
+This code generates a plot of waveforms associated with the sea ice cluster, which was identified using the Gaussian Mixture Model (GMM) clustering technique. It first creates an array x that represents the range of waveform bins for each cleaned echo belonging to the sea ice cluster. Then, it plots all the waveforms corresponding to this cluster, allowing for a visual representation of their structural characteristics. The plt.show() function displays the resulting plot, helping to analyze the waveform patterns of sea ice echoes in the Sentinel-3 altimetry data.
+
+
+![image](https://github.com/user-attachments/assets/21330790-9b6e-4de3-b764-2c4f555f22c6)
+
+
+Visualization of waveforms classified as sea ice using the Gaussian Mixture Model (GMM). Each line represents an individual waveform, providing insight into the distinct structural characteristics of sea ice echoes in Sentinel-3 altimetry data.
+
+
+## Scatter Plots of Clustered Data
+
+This code visualizes the clustering results using scatter plots, where different colors represent different clusters (clusters_gmm):
+
+```python
+plt.scatter(data_cleaned[:,0],data_cleaned[:,1],c=clusters_gmm)
+plt.xlabel("sig_0")
+plt.ylabel("PP")
+plt.show()
+plt.scatter(data_cleaned[:,0],data_cleaned[:,2],c=clusters_gmm)
+plt.xlabel("sig_0")
+plt.ylabel("SSD")
+plt.show()
+plt.scatter(data_cleaned[:,1],data_cleaned[:,2],c=clusters_gmm)
+plt.xlabel("PP")
+plt.ylabel("SSD")
+```
+
+This code generates three scatter plots to visualize the clustering results obtained using the Gaussian Mixture Model (GMM) on Sentinel-3 altimetry data. Each scatter plot represents the relationship between different extracted features: sigma naught (σ₀), Peakiness Parameter (PP), and Stack Standard Deviation (SSD). The first plot visualizes σ₀ vs. PP, showing how these two parameters are distributed and how the clustering algorithm has grouped the data points. The second plot illustrates σ₀ vs. SSD, providing insights into how the backscatter coefficient varies with waveform deviation. The third plot displays PP vs. SSD, helping to further distinguish between different surface types, such as sea ice and leads. Each data point in the scatter plots is color-coded according to its assigned cluster, allowing for a clear visual representation of the clustering results. These plots help in understanding the distinct characteristics of sea ice and leads based on their altimetric properties.
+
+
+![image](https://github.com/user-attachments/assets/96752147-485b-4edb-8cd7-4f6cfe140ed3)
+
+
+![image](https://github.com/user-attachments/assets/cba6ea58-3e8a-44b9-bc7e-34beabcb75f2)
+
+
+![image](https://github.com/user-attachments/assets/b6875888-69e5-40cb-96e3-b4743761c005)
+
+
+These scatter plots visualize the clustering results of the Gaussian Mixture Model (GMM) applied to the Sentinel-3 altimetry dataset. Each plot highlights the relationships between different feature pairs:
+
+First Plot: Displays the relationship between sig_0 (backscatter coefficient) and PP (peakiness parameter). The clusters, represented by different colors, show distinct groupings.
+
+Second Plot: Shows the correlation between sig_0 and SSD (Stack Standard Deviation), indicating how these variables contribute to cluster separation.
+
+Third Plot: Represents the distribution of clusters in the PP vs. SSD feature space, further illustrating the separation between sea ice and leads.
+
+These visualizations help in understanding the structure and classification of different surface types using GMM clustering.
+
+
+## Waveform Alignment Using Cross-Correlation
+
+This code aligns waveforms in the cluster where clusters_gmm == 0 by using cross-correlation:
+
+```python
+from scipy.signal import correlate
+ 
+# Find the reference point (e.g., the peak)
+reference_point_index = np.argmax(np.mean(waves_cleaned[clusters_gmm==0], axis=0))
+ 
+# Calculate cross-correlation with the reference point
+aligned_waves = []
+for wave in waves_cleaned[clusters_gmm==0][::len(waves_cleaned[clusters_gmm == 0]) // 10]:
+    correlation = correlate(wave, waves_cleaned[clusters_gmm==0][0])
+    shift = len(wave) - np.argmax(correlation)
+    aligned_wave = np.roll(wave, shift)
+    aligned_waves.append(aligned_wave)
+ 
+# Plot aligned waves
+for aligned_wave in aligned_waves:
+    plt.plot(aligned_wave)
+ 
+plt.title('Plot of 10 equally spaced functions where clusters_gmm = 0 (aligned)')
+```
+
+This code snippet performs cross-correlation-based alignment of waveforms within the cluster labeled as 0 by the Gaussian Mixture Model (GMM). The process starts by identifying a reference point, specifically the peak of the mean waveform for the cluster. Next, it computes the cross-correlation between each waveform and the first waveform in the cluster, determining the shift required to align the peaks. The waveforms are then adjusted accordingly using np.roll(), ensuring they are aligned with the reference point. Finally, a subset of ten equally spaced waveforms is plotted to visualize the alignment, providing insight into the consistency of waveform structures within the identified cluster.
+
+
+
+![image](https://github.com/user-attachments/assets/a27f9aef-6c03-40db-80ef-5e370ef71738)
+
+
+Caption: Visualization of 10 equally spaced waveforms from the cluster labeled as sea ice (clusters_gmm = 0) after alignment using cross-correlation. This alignment ensures that the peaks of the waveforms are synchronized, allowing for a clearer comparison of waveform structures within the identified cluster.
+
+
+
 
 
 
