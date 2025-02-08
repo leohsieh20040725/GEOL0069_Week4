@@ -42,6 +42,7 @@ This repository classifies echoes in leads and sea ice using machine learning. I
         <ul>
           <li><a href="#Co-locate the data">Co-locate the data</a></li>
         <li><a href="#Proceeding with Sentinel-3 OLCI Download">Proceeding with Sentinel-3 OLCI Download</a></li>
+           <li><a href="#Sentinel-3 SRAL">Sentinel-3 SRAL</a></li>
       </ul>
         </ul>
     </li>
@@ -59,7 +60,7 @@ This repository classifies echoes in leads and sea ice using machine learning. I
           </ul>
         <li><a href="#Gaussian Mixture Models (GMM) [Bishop and Nasrabadi, 2006]">Gaussian Mixture Models (GMM) [Bishop and Nasrabadi, 2006]</a></li>
         <ul>
-        <li><a href="#Introduction to Gaussian Mixture Models</a></li>
+        <li><a href="#Introduction to Gaussian Mixture Models">Introduction to Gaussian Mixture Models</a></li>
         <li><a href="#Why Gaussian Mixture Models for Clustering?">Why Gaussian Mixture Models for Clustering?</a></li>
         <li><a href="#Key Components of GMM">Key Components of GMM</a></li>
         <li><a href="#The EM Algorithm in GMM">The EM Algorithm in GMM</a></li>
