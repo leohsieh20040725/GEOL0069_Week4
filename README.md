@@ -40,6 +40,7 @@ This repository classifies echoes in leads and sea ice using machine learning. I
         <li><a href="#Step 0: Read in Functions Needed">Step 0: Read in Functions Needed</a></li>
         <li><a href="#Step 1: Get the Metadata for satellites (Sentinel-2 and Sentinel-3 OLCI in this case)">Step 1: Get the Metadata for satellites (Sentinel-2 and Sentinel-3 OLCI in this case)</a></li>
         <ul>
+          <li><a href="#Co-locate the data">Co-locate the data</a></li>
         <li><a href="#Proceeding with Sentinel-3 OLCI Download">Proceeding with Sentinel-3 OLCI Download</a></li>
       </ul>
         </ul>
