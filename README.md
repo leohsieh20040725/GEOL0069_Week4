@@ -1,5 +1,5 @@
-# GEOL0069_Week4
-This repository contains my Week 4 assignment, which classifies echoes in leads and sea ice using machine learning. It generates an average echo shape, computes the standard deviation for both categories, and compares results against the ESA official classification using a confusion matrix
+# GEOL0069_Satellite Echo Classification
+This repository classifies echoes in leads and sea ice using machine learning. It generates an average echo shape, computes the standard deviation for both categories, and compares results against the ESA official classification using a confusion matrix
 
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a id="readme-top"></a>
@@ -21,6 +21,7 @@ This repository contains my Week 4 assignment, which classifies echoes in leads 
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
 
+![image](https://github.com/user-attachments/assets/7e91e0b7-e808-4783-9ce5-a81af13b4b38)
 
 
 <!-- TABLE OF CONTENTS -->
@@ -134,6 +135,9 @@ This fusion of datasets enables precise environmental monitoring, making it part
 
 In the following sections, we will walk through the key steps to identify, align, and analyze these datasets effectively.
 
+### Step 0: Read in Functions Needed
+
+To efficiently fetch and process our data, we will begin by loading the essential functions. These functions are the same as those used in the data_fetching notebook from Week 3. Their primary purpose is to retrieve metadata for the two satellites of interest, ensuring a seamless and structured data acquisition process.
 
 
 ```python
