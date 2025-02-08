@@ -504,7 +504,7 @@ def make_timezone_naive(dt):
 This script is designed to fetch, process, and analyze Sentinel-2 and Sentinel-3 Earth observation data from the Copernicus Data Space Ecosystem. It first imports essential libraries like requests, pandas, shapely, and folium to handle API requests, process geospatial data, and visualize satellite footprints. The script manages authentication by obtaining an access token and refreshing it when needed. It includes functions to query Sentinel-3 OLCI (ocean and land color) and SRAL (radar altimeter) data, as well as Sentinel-2 optical data, filtering results by date range, geographic location, and cloud cover percentage. Additionally, it provides a downloading feature for Sentinel products based on unique product IDs. The script processes geospatial footprints, identifying and matching images based on geographic overlap, and visualizes results using interactive maps. Time handling functions ensure correct formatting of timestamps for accurate data retrieval. Overall, this script serves as a complete data pipeline for retrieving, processing, and analyzing Sentinel satellite data, enabling seamless integration with scientific research and Earth observation projects. 🚀
 
 <!-- Step 1: Get the Metadata for satellites (Sentinel-2 and Sentinel-3 OLCI in this case) -->
-## Step 1: Get the Metadata for satellites (Sentinel-2 and Sentinel-3 OLCI in this case)
+### Step 1: Get the Metadata for satellites (Sentinel-2 and Sentinel-3 OLCI in this case)
 In this step, we demonstrate the process of co-locating Sentinel-2 and Sentinel-3 OLCI data by first retrieving their metadata, following the same approach used in Week 3. Since our objective is to identify common locations observed by both satellites, we extract metadata for each separately. This results in two distinct datasets representing the respective satellites, stored as sentinel3_olci_data and sentinel2_data. These metadata tables will serve as the foundation for aligning and analyzing the satellite observations effectively.
 
 
@@ -563,7 +563,7 @@ This code utilizes the display function from the IPython.display module to visua
 ![7a75d1a91255c7e1a9145b45bb2fb72](https://github.com/user-attachments/assets/b428d280-5b6a-4ce4-a588-f9d46936ab1d)
 This table displays metadata retrieved for Sentinel-2 images using the Copernicus Data Space API. It includes details such as product IDs, content type, content length, acquisition dates, publication and modification timestamps, online availability, and storage paths. This dataset is essential for analyzing and identifying relevant Sentinel-2 imagery based on specific timeframes and geospatial locations.
 
-### Co-locate the data
+#### Co-locate the data
 In this section we use the metadata we have just produced to produce the co-location pair details. The logic of the code is match rows from S2 and S3 OLCI by their geo_footprint.
 ```python
 s3_olci_metadata = pd.read_csv(
@@ -619,7 +619,7 @@ This interactive map visualization displays the geographical footprints of the f
 
 
 <!-- Proceeding with Sentinel-3 OLCI Download -->
-## Proceeding with Sentinel-3 OLCI Download
+#### Proceeding with Sentinel-3 OLCI Download
 Next, we shift our focus to retrieving Sentinel-3 OLCI data. This process follows the same structured approach used for Sentinel-2, ensuring consistency in methodology. By applying the same filename conversion logic, we systematically access and download the required datasets from the Copernicus Dataspace. This step ensures seamless integration of Sentinel-3 OLCI data into our analysis pipeline.
 
 ```python
@@ -631,7 +631,7 @@ download_single_product(product_id, file_name, access_token, download_dir)
 ```
 This code snippet facilitates the download of a specific Sentinel-3 OLCI product from the Copernicus Dataspace. The download_dir variable is used to specify the target directory where the downloaded file will be saved. The product_id and file_name are extracted from the results dataframe, selecting the first product entry for download. The download_single_product function is then called with these parameters, along with an access_token for authentication. This ensures secure and structured retrieval of the satellite data, storing it in the designated directory for further analysis. Users can modify the product_id, file_name, and download_dir to customize their download preferences.
 
-### Sentinel-3 SRAL
+#### Sentinel-3 SRAL
 In addition to co-locating Sentinel-2 and Sentinel-3 OLCI data, we can also integrate Sentinel-3 SRAL altimetry data. The overall approach remains the same, requiring only the retrieval of the S3 SRAL metadata. By incorporating SRAL data, we enhance our dataset with valuable altimetry measurements, enabling a more comprehensive analysis of surface characteristics.
 
 ```python
@@ -716,8 +716,8 @@ In this notebook, we will tackle two key tasks:
 By the end of this section, you will have a solid foundation in applying unsupervised learning for remote sensing and EO data analysis.
 
 <!-- Introduction to Unsupervised Learning Methods [Bishop and Nasrabadi, 2006] -->
-## Introduction to Unsupervised Learning Methods [Bishop and Nasrabadi, 2006]
-### Introduction to K-means Clustering
+### Introduction to Unsupervised Learning Methods [Bishop and Nasrabadi, 2006]
+#### Introduction to K-means Clustering
 K-means clustering is a widely used unsupervised learning algorithm designed to partition a dataset into k distinct groups (clusters). The parameter k, which represents the number of clusters, is predefined by the user. The algorithm classifies data points based on feature similarity, ensuring that data points within the same cluster are more alike than those in different clusters [MacQueen et al., 1967].
 
 At its core, K-means clustering works by:
@@ -731,14 +731,14 @@ At its core, K-means clustering works by:
 4-Iterating this process until the centroids remain stable, minimizing the variation within clusters.
 
 This method is particularly useful for pattern recognition, data segmentation, and exploratory data analysis, making it a fundamental tool in unsupervised learning.
-### Why K-means for Clustering?
+#### Why K-means for Clustering?
 K-means clustering is particularly effective in scenarios where:
 
 1-Unknown Data Structure: The algorithm does not require prior knowledge of the data distribution or structure, making it an excellent choice for exploratory data analysis and pattern detection.
 
 2-Efficiency and Scalability: K-means is computationally efficient, easy to implement, and capable of handling large datasets with minimal complexity, making it a preferred choice for various real-world applications.
 
-### Key Components of K-means
+#### Key Components of K-means
 1-Choosing K: The number of clusters (k) must be predefined before running the algorithm, which can significantly impact the clustering results.
 
 2-Centroid Initialization: The initial placement of cluster centroids plays a crucial role in determining the final clustering outcome.
@@ -747,15 +747,15 @@ K-means clustering is particularly effective in scenarios where:
 
 4-Update Step: The centroids are recalculated as the mean position of all data points assigned to their respective clusters.
 
-### The Iterative Process of K-means
+#### The Iterative Process of K-means
 K-means follows an iterative approach where the assignment and update steps repeat until the centroids stabilize, meaning they no longer change significantly. This process minimizes intra-cluster variation and ensures convergence to an optimal clustering solution, though it may sometimes settle on a local optimum.
 
-### Advantages of K-means
+#### Advantages of K-means
 1-High Efficiency: K-means is computationally fast, making it well-suited for handling large datasets.
 
 2-Ease of Interpretation: The clustering results are straightforward, making it easy to analyze and understand the underlying data patterns.
 
-### Basic Code Implementation
+#### Basic Code Implementation
 Below is a fundamental implementation of the K-means clustering algorithm. This example provides a solid starting point for understanding how the algorithm works and can be adapted for various data analysis tasks. By exploring this implementation, you can gain insights into clustering techniques and apply them effectively to real-world datasets.
 
 ```python
@@ -799,14 +799,15 @@ plt.show()
 This Python script implements a basic K-means clustering algorithm using the scikit-learn library. It begins by importing necessary libraries, including KMeans for clustering, matplotlib.pyplot for visualization, and numpy for numerical operations. The script generates a sample dataset consisting of 100 random points in a two-dimensional space. A K-means model is then initialized with four clusters (n_clusters=4) and trained on this dataset using kmeans.fit(X). After training, the model predicts the cluster assignments for each data point, storing the results in y_kmeans. To visualize the clustering results, a scatter plot is created where each point is color-coded according to its assigned cluster. Additionally, the computed centroids of the clusters are extracted using kmeans.cluster_centers_ and displayed as black dots to indicate the center of each group. Finally, the plt.show() function renders the plot, providing a clear visualization of how the algorithm has grouped the data into distinct clusters. This implementation serves as a foundational example for understanding how K-means clustering can be applied to pattern recognition and data segmentation tasks.
 
 ![image](https://github.com/user-attachments/assets/e336776c-92d6-4d6a-b3fc-be0c1f41960d)
+
 Visualization of K-means clustering results on a randomly generated dataset. The colored points represent individual data samples grouped into four clusters, while the black dots indicate the centroids of each cluster, calculated by the K-means algorithm.
 
 <!-- Gaussian Mixture Models (GMM) [Bishop and Nasrabadi, 2006] -->
-## Gaussian Mixture Models (GMM) [Bishop and Nasrabadi, 2006]
-### Introduction to Gaussian Mixture Models
+### Gaussian Mixture Models (GMM) [Bishop and Nasrabadi, 2006]
+#### Introduction to Gaussian Mixture Models
 Gaussian Mixture Models (GMM) are a powerful probabilistic approach for modeling normally distributed subpopulations within a larger dataset. This technique assumes that data is generated from a combination of multiple Gaussian distributions, each characterized by its unique mean and variance [Reynolds and others, 2009]. GMMs are widely employed in clustering and density estimation, offering a structured way to represent intricate data distributions by merging simpler components.
 
-### Why Gaussian Mixture Models for Clustering?
+#### Why Gaussian Mixture Models for Clustering?
 Gaussian Mixture Models are particularly advantageous in clustering applications where:
 
 1-Soft Clustering Capabilities: Unlike K-means, which assigns each data point to a single cluster, GMM provides a probabilistic classification. This means each data point has a probability of belonging to multiple clusters, enabling a more nuanced and flexible clustering approach while accounting for uncertainty.
@@ -815,7 +816,7 @@ Gaussian Mixture Models are particularly advantageous in clustering applications
 
 These features make GMM a robust choice for clustering scenarios where data exhibits overlapping distributions or varying density regions.
 
-### Key Components of GMM
+#### Key Components of GMM
 1-Defining the Number of Components (Gaussians):
 Similar to specifying the number of clusters in K-means, GMM requires determining the number of Gaussian components. This defines how many distinct distributions will be used to model the data.
 
@@ -827,7 +828,7 @@ The shape and orientation of clusters are influenced by the covariance type of t
 
 
 
-### The EM Algorithm in GMM
+#### The EM Algorithm in GMM
 The EM algorithm follows an iterative two-step process to optimize clustering:
 
 1-Expectation Step (E-step):
@@ -839,7 +840,7 @@ Updates the Gaussian parameters (mean, variance, and weight) to maximize the ove
 This process repeats until convergence, meaning the parameters stabilize and the model achieves an optimal fit.
 
 
-### Advantages of GMM
+#### Advantages of GMM
 1-Probabilistic Soft Clustering:
 Unlike hard clustering methods like K-means, GMM provides a probability score for each data point’s cluster membership. This helps in capturing uncertainty and overlapping group structures.
 
@@ -848,7 +849,7 @@ GMM supports non-spherical cluster formations, making it well-suited for dataset
 
 By leveraging GMM’s adaptability and probabilistic framework, it becomes an excellent choice for clustering complex datasets with overlapping distributions.
 
-### Basic Code Implementation
+#### Basic Code Implementation
 Below is a fundamental implementation of the Gaussian Mixture Model (GMM). This example provides a foundational understanding of how GMM works and serves as a practical starting point for incorporating it into data analysis tasks.
 
 
@@ -877,10 +878,10 @@ This code demonstrates the implementation of the Gaussian Mixture Model (GMM) fo
 ![image](https://github.com/user-attachments/assets/ba6c9c55-ed2b-43ef-82a8-543445e64478)
 Visualization of clustering results using the Gaussian Mixture Model (GMM). The data points are grouped into three distinct clusters, each represented by a different color. The black points indicate the computed cluster centers (means), highlighting the probabilistic nature of GMM clustering.
 
-## Image Classification
+### Image Classification
 In this section, we delve into the application of unsupervised learning techniques for image classification. Our primary focus is distinguishing between sea ice and leads using Sentinel-2 imagery. By leveraging clustering algorithms, we can identify and classify patterns in the imagery without the need for labeled data, enhancing our ability to analyze and interpret remote sensing data efficiently.
 
-### K-Means Implementation
+#### K-Means Implementation
 ```python
 import rasterio
 import numpy as np
@@ -936,7 +937,7 @@ This approach enables an unsupervised classification of Sentinel-2 imagery, allo
 ![image](https://github.com/user-attachments/assets/4dbda879-080b-406b-b1f0-24b97a1d7aa8)
 This image represents the result of K-means clustering applied to a Sentinel-2 optical band (B4). The clustering algorithm groups pixels into two distinct clusters, as shown by the different colors. The yellow regions likely correspond to sea ice or land, while the darker regions represent open water or other surface types. The color bar on the right indicates cluster labels, with a no-data value (-1) assigned to areas outside the valid data range. This classification helps in distinguishing different surface features in remote sensing imagery.
 
-### GMM Implementation
+#### GMM Implementation
 
 
 ```python
@@ -993,10 +994,10 @@ Once the model is trained, it assigns cluster labels to the valid pixels. The re
 Visualization of Gaussian Mixture Model (GMM) clustering applied to Sentinel-2 Band 4 imagery. The image showcases different clusters identified in the dataset, with the color scale representing distinct cluster labels. This method helps differentiate between various land cover types, such as sea ice, open water, and land surfaces, based on spectral reflectance patterns.
 
 
-## Altimetry Classification
+### Altimetry Classification
 In this section, we explore the application of unsupervised learning techniques for classifying altimetry data, specifically focusing on distinguishing sea ice and leads within the Sentinel-3 altimetry dataset. This approach enables us to analyze surface features based on satellite-derived elevation measurements, improving our understanding of ice dynamics and oceanographic processes.
 
-### Read in Functions Needed
+#### Read in Functions Needed
 Before proceeding with modeling, it is essential to preprocess the data to ensure compatibility with analytical methods. This involves converting raw altimetry measurements into meaningful variables, such as peakiness and stack standard deviation (SSD), which provide insights into surface roughness and classification potential. Effective preprocessing enhances model accuracy and ensures a robust classification process.
 
 
@@ -1396,7 +1397,7 @@ This code generates a plot of waveforms associated with the sea ice cluster, whi
 Visualization of waveforms classified as sea ice using the Gaussian Mixture Model (GMM). Each line represents an individual waveform, providing insight into the distinct structural characteristics of sea ice echoes in Sentinel-3 altimetry data.
 
 
-## Scatter Plots of Clustered Data
+### Scatter Plots of Clustered Data
 
 This code visualizes the clustering results using scatter plots, where different colors represent different clusters (clusters_gmm):
 
@@ -1437,7 +1438,7 @@ Third Plot: Represents the distribution of clusters in the PP vs. SSD feature sp
 These visualizations help in understanding the structure and classification of different surface types using GMM clustering.
 
 
-## Waveform Alignment Using Cross-Correlation
+### Waveform Alignment Using Cross-Correlation
 
 This code aligns waveforms in the cluster where clusters_gmm == 0 by using cross-correlation:
 
@@ -1471,7 +1472,7 @@ This code snippet performs cross-correlation-based alignment of waveforms within
 
 Caption: Visualization of 10 equally spaced waveforms from the cluster labeled as sea ice (clusters_gmm = 0) after alignment using cross-correlation. This alignment ensures that the peaks of the waveforms are synchronized, allowing for a clearer comparison of waveform structures within the identified cluster.
 
-## Compare with ESA data
+### Compare with ESA data
 In the ESA dataset, sea ice = 1 and lead = 2. Therefore, we need to subtract 1 from it so our predicted labels are comparable with the official product labels:
 
 ```python
