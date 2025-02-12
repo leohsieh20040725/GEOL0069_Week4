@@ -381,7 +381,7 @@ Visualization of Gaussian Mixture Model (GMM) clustering applied to Sentinel-2 B
 This section applies unsupervised learning to classify Sentinel-3 altimetry data, focusing on distinguishing sea ice from leads using satellite-derived elevation measurements. This approach enhances the analysis of surface features, improving insights into ice dynamics and oceanographic processes.
 
 #### Read in Functions Needed
-This Python script processes and analyzes Sentinel-3 SAR altimetry data, focusing on waveform characteristics like peakiness and stack standard deviation (SSD) to classify sea ice and leads. Using NumPy, SciPy, Matplotlib, and Scikit-learn, it extracts altimetry variables, cleans missing values, and applies machine learning clustering techniques such as K-Means, DBSCAN, and Gaussian Mixture Models (GMMs). The unpack_gpod function extracts key parameters like latitude, longitude, waveforms, and backscatter coefficient, ensuring data consistency by interpolating low-resolution (1Hz) data to high-resolution (20Hz) timestamps. The calculate_SSD function estimates waveform variability using Gaussian curve fitting, helping classify surface types. The dataset is then standardized using Scikit-learn’s StandardScaler to optimize clustering performance. To handle missing values, the script identifies and removes NaN entries, ensuring only valid observations are included. It filters data based on surface classification flags, keeping only relevant values for clustering. The GMM model is applied with two components, classifying data into distinct clusters based on statistical properties. The Expectation-Maximization (EM) algorithm refines cluster parameters iteratively, allowing for soft clustering where data points have probabilistic cluster assignments. The script also analyzes cluster distribution, using np.unique() to count data points per cluster. It visualizes waveform differences between sea ice and leads, plotting mean and standard deviation for each class to highlight reflectivity variations. This approach enhances remote sensing classification, improving the interpretation of Sentinel-3 altimetry data for environmental and climate studies.
+This Python script processes Sentinel-3 SAR altimetry data, focusing on waveform characteristics like peakiness and stack standard deviation (SSD) to classify sea ice and leads. It utilizes NumPy, SciPy, Matplotlib, and Scikit-learn for data extraction, cleaning, and clustering using K-Means, DBSCAN, and Gaussian Mixture Models (GMMs). The unpack_gpod function extracts key parameters such as latitude, longitude, waveforms, and backscatter coefficient, interpolating 1Hz data to 20Hz for consistency. calculate_SSD estimates waveform variability using Gaussian curve fitting, aiding classification. The dataset is standardized with StandardScaler to optimize clustering, and NaN values are removed to ensure data integrity. The GMM model, with two components, classifies data into probabilistic clusters, refined iteratively by the Expectation-Maximization (EM) algorithm. Cluster distribution is analyzed using np.unique(), and waveform differences between sea ice and leads are visualized by plotting mean and standard deviation. The blue curve represents sea ice, while the orange curve corresponds to leads, highlighting variations in reflectivity patterns and improving remote sensing classification for environmental and climate studies.
 
 ```python
 # mean and standard deviation for all echoes
@@ -404,9 +404,6 @@ plt.legend()
 
 ![7c3651827a7ebef8494864dcce54cc8](https://github.com/user-attachments/assets/88e34ef0-0769-4cbb-9a76-073679057a75)
 
-Visualization of the mean waveforms for sea ice and leads, with shaded areas representing one standard deviation. This plot helps to compare the reflectivity patterns of the two surface types, highlighting differences in waveform characteristics. The blue curve corresponds to sea ice, while the orange curve represents leads, demonstrating variability in their respective waveform signals.
-
-
 
 ```python
 x = np.stack([np.arange(1,waves_cleaned.shape[1]+1)]*waves_cleaned.shape[0])
@@ -414,11 +411,8 @@ plt.plot(x,waves_cleaned)  # plot of all the echos
 plt.show()
 ```
 
-This code generates a plot of all waveform echoes in the dataset. It first creates a stacked array x, which represents the bin indices for the waveforms. The waveforms stored in waves_cleaned are then plotted against these bin indices using plt.plot(x, waves_cleaned). This visualization helps in understanding the distribution and variability of waveform signals across different observations. Finally, plt.show() displays the plot, allowing for an overall inspection of the waveform structures.
-
 ![image](https://github.com/user-attachments/assets/f0985c42-840f-49b7-a879-13fbe593d8e2)
 
-Visualization of all waveform echoes, showing the distribution and intensity of the signals across different bins. The central peak indicates the dominant signal response, while the spread represents variations in waveform characteristics.
 
 ```python
 # plot echos for the lead cluster
@@ -427,12 +421,8 @@ plt.plot(x,waves_cleaned[clusters_gmm==1])  # plot of all the echos
 plt.show()
 ```
 
-This code generates a plot displaying all waveform echoes that belong to the lead cluster, as identified by the Gaussian Mixture Model (GMM). It first creates an array x representing the bin positions for each waveform. Then, it extracts only the waveforms assigned to the lead class (clusters_gmm==1) and plots them to visualize their distribution. The resulting plot helps analyze the waveform characteristics specific to the lead category.
-
 ![image](https://github.com/user-attachments/assets/42acd430-03e3-406f-b61f-d0bbdee17288)
 
-
-Visualization of all waveform echoes classified as lead by the Gaussian Mixture Model (GMM). The plot represents the waveform intensity distribution across different bins, highlighting the distinct characteristics of the lead category in the Sentinel-3 altimetry dataset.
 
 ```python
 # plot echos for the sea ice cluster
@@ -441,18 +431,13 @@ plt.plot(x,waves_cleaned[clusters_gmm==0])  # plot of all the echos
 plt.show()
 ```
 
-This code generates a plot of waveforms associated with the sea ice cluster, which was identified using the Gaussian Mixture Model (GMM) clustering technique. It first creates an array x that represents the range of waveform bins for each cleaned echo belonging to the sea ice cluster. Then, it plots all the waveforms corresponding to this cluster, allowing for a visual representation of their structural characteristics. The plt.show() function displays the resulting plot, helping to analyze the waveform patterns of sea ice echoes in the Sentinel-3 altimetry data.
-
-
 ![image](https://github.com/user-attachments/assets/21330790-9b6e-4de3-b764-2c4f555f22c6)
 
 
-Visualization of waveforms classified as sea ice using the Gaussian Mixture Model (GMM). Each line represents an individual waveform, providing insight into the distinct structural characteristics of sea ice echoes in Sentinel-3 altimetry data.
-
-
 ### Scatter Plots of Clustered Data
+This code visualizes Gaussian Mixture Model (GMM) clustering results on Sentinel-3 altimetry data using scatter plots, where each color represents a different cluster (clusters_gmm). It generates three plots to illustrate relationships between key features: sigma naught (σ₀), Peakiness Parameter (PP), and Stack Standard Deviation (SSD). The first plot shows σ₀ vs. PP, highlighting how backscatter and peakiness are distributed across clusters. The second plot visualizes σ₀ vs. SSD, revealing variations in waveform deviation. The third plot displays PP vs. SSD, helping to distinguish between sea ice and leads. These scatter plots provide a clear representation of cluster separation, enhancing the interpretation of altimetric properties in surface classification.
 
-This code visualizes the clustering results using scatter plots, where different colors represent different clusters (clusters_gmm):
+
 
 ```python
 plt.scatter(data_cleaned[:,0],data_cleaned[:,1],c=clusters_gmm)
@@ -468,8 +453,6 @@ plt.xlabel("PP")
 plt.ylabel("SSD")
 ```
 
-This code generates three scatter plots to visualize the clustering results obtained using the Gaussian Mixture Model (GMM) on Sentinel-3 altimetry data. Each scatter plot represents the relationship between different extracted features: sigma naught (σ₀), Peakiness Parameter (PP), and Stack Standard Deviation (SSD). The first plot visualizes σ₀ vs. PP, showing how these two parameters are distributed and how the clustering algorithm has grouped the data points. The second plot illustrates σ₀ vs. SSD, providing insights into how the backscatter coefficient varies with waveform deviation. The third plot displays PP vs. SSD, helping to further distinguish between different surface types, such as sea ice and leads. Each data point in the scatter plots is color-coded according to its assigned cluster, allowing for a clear visual representation of the clustering results. These plots help in understanding the distinct characteristics of sea ice and leads based on their altimetric properties.
-
 
 ![image](https://github.com/user-attachments/assets/96752147-485b-4edb-8cd7-4f6cfe140ed3)
 
@@ -480,20 +463,10 @@ This code generates three scatter plots to visualize the clustering results obta
 ![image](https://github.com/user-attachments/assets/b6875888-69e5-40cb-96e3-b4743761c005)
 
 
-These scatter plots visualize the clustering results of the Gaussian Mixture Model (GMM) applied to the Sentinel-3 altimetry dataset. Each plot highlights the relationships between different feature pairs:
-
-First Plot: Displays the relationship between sig_0 (backscatter coefficient) and PP (peakiness parameter). The clusters, represented by different colors, show distinct groupings.
-
-Second Plot: Shows the correlation between sig_0 and SSD (Stack Standard Deviation), indicating how these variables contribute to cluster separation.
-
-Third Plot: Represents the distribution of clusters in the PP vs. SSD feature space, further illustrating the separation between sea ice and leads.
-
-These visualizations help in understanding the structure and classification of different surface types using GMM clustering.
 
 
 ### Waveform Alignment Using Cross-Correlation
-
-This code aligns waveforms in the cluster where clusters_gmm == 0 by using cross-correlation:
+This code aligns waveforms in the GMM cluster (clusters_gmm == 0) using cross-correlation. It first identifies a reference point by locating the peak of the mean waveform for the cluster. Cross-correlation is then applied to determine the shift needed to align each waveform with the first waveform in the cluster. Using np.roll(), the waveforms are adjusted to ensure peak synchronization. Finally, a subset of 10 equally spaced waveforms is plotted, visualizing the alignment and providing insight into waveform consistency within the sea ice cluster.
 
 ```python
 from scipy.signal import correlate
@@ -516,47 +489,12 @@ for aligned_wave in aligned_waves:
 plt.title('Plot of 10 equally spaced functions where clusters_gmm = 0 (aligned)')
 ```
 
-This code snippet performs cross-correlation-based alignment of waveforms within the cluster labeled as 0 by the Gaussian Mixture Model (GMM). The process starts by identifying a reference point, specifically the peak of the mean waveform for the cluster. Next, it computes the cross-correlation between each waveform and the first waveform in the cluster, determining the shift required to align the peaks. The waveforms are then adjusted accordingly using np.roll(), ensuring they are aligned with the reference point. Finally, a subset of ten equally spaced waveforms is plotted to visualize the alignment, providing insight into the consistency of waveform structures within the identified cluster.
-
-
-
 ![image](https://github.com/user-attachments/assets/a27f9aef-6c03-40db-80ef-5e370ef71738)
 
 
-Caption: Visualization of 10 equally spaced waveforms from the cluster labeled as sea ice (clusters_gmm = 0) after alignment using cross-correlation. This alignment ensures that the peaks of the waveforms are synchronized, allowing for a clearer comparison of waveform structures within the identified cluster.
-
 ### Compare with ESA data
-In the ESA dataset, sea ice = 1 and lead = 2. Therefore, we need to subtract 1 from it so our predicted labels are comparable with the official product labels:
+In the ESA dataset, sea ice = 1 and lead = 2, so 1 is subtracted from all values in flag_cleaned to ensure label compatibility with machine learning models using zero-based indexing. The modified array, flag_cleaned_modified, retains the same structure but with values shifted down by one. To evaluate Gaussian Mixture Model (GMM) clustering, true labels from flag_cleaned_modified are compared with predicted labels from clusters_gmm. A confusion matrix (confusion_matrix(true_labels, predicted_gmm)) summarizes correct and misclassified instances, while a classification report (classification_report(true_labels, predicted_gmm)) provides precision, recall, and F1-score for each class. The results show high accuracy, with 8,856 sea ice and 3,293 lead instances correctly classified, and minimal misclassifications (22 for sea ice, 24 for leads). With an overall accuracy of 100%, GMM effectively distinguishes between the two classes.
 
-```python
-flag_cleaned_modified = flag_cleaned - 1
-```
-
-This line of code, flag_cleaned_modified = flag_cleaned - 1, modifies the flag_cleaned array by subtracting 1 from each of its elements. The purpose of this operation is likely to adjust the labeling of data categories, ensuring that the values start from zero instead of one. This can be useful for compatibility with machine learning models that expect zero-based indexing or for standardizing the dataset before further processing. The modified array, flag_cleaned_modified, retains the same structure as flag_cleaned but with all values shifted down by one.
-
-
-```python
-from sklearn.metrics import confusion_matrix, classification_report
-
-true_labels = flag_cleaned_modified   # true labels from the ESA dataset
-predicted_gmm = clusters_gmm          # predicted labels from GMM method
-
-# Compute confusion matrix
-conf_matrix = confusion_matrix(true_labels, predicted_gmm)
-
-# Print confusion matrix
-print("Confusion Matrix:")
-print(conf_matrix)
-
-# Compute classification report
-class_report = classification_report(true_labels, predicted_gmm)
-
-# Print classification report
-print("\nClassification Report:")
-print(class_report)
-```
-
-This code evaluates the performance of the Gaussian Mixture Model (GMM) clustering method by comparing its predicted labels to the actual labels from the ESA dataset. First, the true labels are extracted from flag_cleaned_modified, while the predicted labels are obtained from the GMM clustering results stored in clusters_gmm. To assess the accuracy of the clustering, the code computes a confusion matrix using confusion_matrix(true_labels, predicted_gmm), which provides a summary of correct and incorrect classifications for each category. The confusion matrix is then printed to analyze the distribution of misclassified data points. Additionally, the code generates a classification report using classification_report(true_labels, predicted_gmm), which calculates key performance metrics such as precision, recall, and F1-score for each class. This report provides a more detailed evaluation of the clustering model's effectiveness in distinguishing between different data categories. By analyzing these outputs, we can determine how well the GMM model aligns with the actual classifications and gain insights into potential improvements.
 
 ```python
 Confusion Matrix:
@@ -575,7 +513,7 @@ weighted avg       1.00      1.00      1.00     12195
 ```
 
 
-The confusion matrix and classification report summarize the performance of the Gaussian Mixture Model (GMM) clustering. The confusion matrix shows that 8,856 instances were correctly classified as class 0, while 3,293 instances were correctly classified as class 1. There were 22 misclassified instances of class 0 and 24 misclassified instances of class 1. The classification report indicates a precision, recall, and F1-score close to 1.00, demonstrating high accuracy in distinguishing between the two classes. The overall accuracy is 100%, suggesting that the clustering method effectively separates the data into meaningful groups.
+
 
 
 
